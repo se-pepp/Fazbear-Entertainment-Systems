@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>R-Play Cart</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #007aff;
+      color: white;
+    }
+    button {
+      padding: 6px 10px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    #checkout-btn {
+      margin-top: 20px;
+      display: block;
+      width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Your Cart</h1>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="features.html">Features</a> |
+      <a href="games.html">Games</a> |
+      <a href="store.html">Store</a> |
+      <a href="cart.html">Cart</a>
+    </nav>
+  </header>
+
+  <main>
+    <table id="cart-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2 style="text-align:center" id="total-price">Total: $0.00</h2>
+    <button id="checkout-btn">Pay with Square (Demo)</button>
+  </main>
+
+  <script>
+    const products = {
+      "rplay-console": {
+        name: "R-Play Console",
+        price: 299.99,
+      },
+      "expansion-pack-1": {
+        name: "Expansion Pack 1",
+        price: 49.99,
+      },
+      "expansion-pack-2": {
+        name: "Expansion Pack 2",
+        price: 69.99,
+      }
+    };
+
+    let cart = JSON.parse(localStorage.getItem("rplayCart")) || {};
+    const tbody = document.querySelector("#cart-table tbody");
+    const totalPriceElem = document.getElementById("total-price");
+    const checkoutBtn = document.getElementById("checkout-btn");
+
+    function renderCart() {
+      tbody.innerHTML = "";
+      let total = 0;
+      Object.keys(cart).forEach(productId => {
+        const qty = cart[productId];
+        const product = products[productId];
+        const itemTotal = product.price * qty;
+        total += itemTotal;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${product.name}</td>
+          <td>${qty}</td>
+          <td>$${product.price.toFixed(2)}</td>
+          <td>$${itemTotal.toFixed(2)}</td>
+          <td><button onclick="removeFromCart('${productId}')">X</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      totalPriceElem.textContent = `Total: $${total.toFixed(2)}`;
+
+      if (Object.keys(cart).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5">Your cart is empty.</td></tr>`;
+        checkoutBtn.style.display = "none";
+      } else {
+        checkoutBtn.style.display = "block";
+      }
+    }
+
+    function removeFromCart(productId) {
+      delete cart[productId];
+      saveCart();
+      renderCart();
+    }
+
+    function saveCart() {
+      localStorage.setItem("rplayCart", JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      const count = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+      const cartLink = document.querySelector('nav a[href="cart.html"]');
+      cartLink.setAttribute("data-count", count);
+    }
+
+    checkoutBtn.addEventListener("click", () => {
+      // Fake Square payment flow
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = "Processing payment...";
+      setTimeout(() => {
+        alert("Payment successful! Thank you for your purchase.");
+        cart = {};
+        saveCart();
+        renderCart();
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = "Pay with Square (Demo)";
+      }, 2000);
+    });
+
+    renderCart();
+    updateCartCount();
+  </script>
+</body>
+</html>
