@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Summary – R-Play</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">R-Play</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+    </nav>
+  </header>
+
+  <section class="summary">
+    <h1>🎉 Order Summary</h1>
+    <div id="summary-details">
+      <p><strong>Name:</strong> <span id="summary-name"></span></p>
+      <p><strong>Email:</strong> <span id="summary-email"></span></p>
+      <p><strong>Address:</strong> <span id="summary-address"></span></p>
+      <h2>🛒 Items:</h2>
+      <ul id="summary-items"></ul>
+      <p><strong>Total:</strong> $<span id="summary-total"></span></p>
+    </div>
+    <a class="btn" href="store.html">Return to Store</a>
+  </section>
+
+  <script>
+    const summary = JSON.parse(localStorage.getItem('lastOrder'));
+    if (summary) {
+      document.getElementById('summary-name').textContent = summary.name;
+      document.getElementById('summary-email').textContent = summary.email;
+      document.getElementById('summary-address').textContent = summary.address;
+
+      let total = 0;
+      const list = document.getElementById('summary-items');
+      summary.items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} – $${item.price}`;
+        total += item.price;
+        list.appendChild(li);
+      });
+      document.getElementById('summary-total').textContent = total.toFixed(2);
+    } else {
+      document.getElementById('summary-details').innerHTML = "<p>No recent order found.</p>";
+    }
+  </script>
+</body>
+</html>

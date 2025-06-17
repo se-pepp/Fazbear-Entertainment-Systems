@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout – R-Play</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">R-Play</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Store</a>
+    </nav>
+  </header>
+
+  <section class="checkout">
+    <h1>Checkout</h1>
+    <form id="checkout-form">
+      <label>Name</label>
+      <input type="text" required><br>
+      <label>Email</label>
+      <input type="email" required><br>
+      <label>Shipping Address</label>
+      <textarea required></textarea><br>
+      <button type="submit">Place Order</button>
+    </form>
+    <p id="order-status"></p>
+  </section>
+
+  <script>
+    const form = document.getElementById('checkout-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      const order = {
+        name: form[0].value,
+        email: form[1].value,
+        address: form[2].value,
+        items: cart
+      };
+
+      const res = await fetch('https://YOUR-GLITCH-URL/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      });
+
+      if (res.ok) {
+        localStorage.removeItem('cart');
+        document.getElementById('order-status').innerText = '✅ Order placed!';
+      } else {
+        document.getElementById('order-status').innerText = '❌ Error placing order.';
+      }
+    });
+  </script>
+</body>
+</html>
